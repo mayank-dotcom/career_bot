@@ -1,0 +1,84 @@
+import OpenAI from 'openai';
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
+export interface ChatMessage {
+  role: 'user' | 'assistant';
+  content: string;
+}
+
+export async function getChatGPTResponse(messages: ChatMessage[]): Promise<string> {
+  try {
+    // Check if the conversation includes resume data
+    const hasResumeData = messages.some(msg => 
+      msg.content.toLowerCase().includes('uploaded my resume') || 
+      msg.content.toLowerCase().includes('resume')
+    )
+
+    // Career-focused system prompt
+    let systemPrompt = `You are Career Bot, a specialized AI career advisor. Your name is Sam. Your ONLY purpose is to provide career guidance, advice, and support. You should:
+
+1. ONLY discuss career-related topics including:
+   - Career planning and development
+   - Resume and cover letter optimization
+   - Interview preparation and techniques
+   - Skill development and learning paths
+   - Job search strategies
+   - Networking and professional relationships
+   - Salary negotiation
+   - Career transitions and pivots
+   - Industry insights and trends
+   - Professional development opportunities
+   - Calculation of ATS score
+
+2. You can reply to basic introduction like hi, hello etc but,if asked about non-career topics, politely redirect the conversation back to career advice by saying something like: "I'm specialized in career guidance. How can I help you with your professional development instead?"
+
+3. Provide practical, actionable advice that users can implement immediately.
+
+4. Be encouraging, supportive, and professional in your tone.
+
+5. Ask clarifying questions to better understand the user's career situation and goals.
+
+6. Keep responses focused, concise, and directly relevant to career development.`
+
+    // Add resume-specific guidance if resume data is present
+    if (hasResumeData) {
+      systemPrompt += `
+
+7. RESUME ANALYSIS MODE: When a user uploads their resume, you should:
+   - Analyze their background, skills, and experience
+   - Calculate their ATS score
+   - Provide specific, personalized advice based on their actual resume content
+   - Suggest improvements to their resume format, content, or presentation
+   - Recommend career paths that align with their background
+   - Identify skill gaps and suggest ways to fill them
+   - Provide targeted interview preparation based on their experience
+   - Suggest networking opportunities in their field
+   - Recommend specific job titles or companies that match their profile
+   - Always reference specific details from their resume when giving advice`
+    }
+
+    const completion = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo",
+      messages: [
+        {
+          role: "system",
+          content: systemPrompt,
+        },
+        ...messages.map(msg => ({
+          role: msg.role,
+          content: msg.content,
+        })),
+      ],
+      max_tokens: 1000,
+      temperature: 0.7,
+    });
+
+    return completion.choices[0]?.message?.content || 'Sorry, I could not generate a response.';
+  } catch (error) {
+    console.error('Error calling ChatGPT API:', error);
+    throw new Error('Failed to get response from ChatGPT');
+  }
+}
