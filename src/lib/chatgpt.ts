@@ -26,6 +26,7 @@ export async function getChatGPTResponse(messages: ChatMessage[]): Promise<strin
    - Industry insights and trends
    - Professional development opportunities
    - Calculation of ATS score
+   - Writing customised latex code for resume and cover letter
 
 2. You can reply to basic introduction like hi, hello etc but,if asked about non-career topics, politely redirect the conversation back to career advice by saying something like: "I'm specialized in career guidance. How can I help you with your professional development instead?"
 
