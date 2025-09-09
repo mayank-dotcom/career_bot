@@ -11,14 +11,8 @@ export interface ChatMessage {
 
 export async function getChatGPTResponse(messages: ChatMessage[]): Promise<string> {
   try {
-    // Check if the conversation includes resume data
-    const hasResumeData = messages.some(msg => 
-      msg.content.toLowerCase().includes('uploaded my resume') || 
-      msg.content.toLowerCase().includes('resume')
-    )
-
     // Career-focused system prompt
-    let systemPrompt = `You are Career Bot, a specialized AI career advisor. Your name is Sam. Your ONLY purpose is to provide career guidance, advice, and support. You should:
+    const systemPrompt = `You are Career Bot, a specialized AI career advisor. Your name is Sam. Your ONLY purpose is to provide career guidance, advice, and support. You should:
 
 1. ONLY discuss career-related topics including:
    - Career planning and development
@@ -43,35 +37,18 @@ export async function getChatGPTResponse(messages: ChatMessage[]): Promise<strin
 
 6. Keep responses focused, concise, and directly relevant to career development.`
 
-    // Add resume-specific guidance if resume data is present
-    if (hasResumeData) {
-      systemPrompt += `
-
-7. RESUME ANALYSIS MODE: When a user uploads their resume, you should:
-   - Analyze their background, skills, and experience
-   - Calculate their ATS score
-   - Provide specific, personalized advice based on their actual resume content
-   - Suggest improvements to their resume format, content, or presentation
-   - Recommend career paths that align with their background
-   - Identify skill gaps and suggest ways to fill them
-   - Provide targeted interview preparation based on their experience
-   - Suggest networking opportunities in their field
-   - Recommend specific job titles or companies that match their profile
-   - Always reference specific details from their resume when giving advice`
-    }
+    // Prepare messages for OpenAI API
+    const openaiMessages: Array<{role: "system" | "user" | "assistant", content: string}> = [
+      {
+        role: "system",
+        content: systemPrompt,
+      },
+      ...messages
+    ]
 
     const completion = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
-      messages: [
-        {
-          role: "system",
-          content: systemPrompt,
-        },
-        ...messages.map(msg => ({
-          role: msg.role,
-          content: msg.content,
-        })),
-      ],
+      messages: openaiMessages as any,
       max_tokens: 1000,
       temperature: 0.7,
     });

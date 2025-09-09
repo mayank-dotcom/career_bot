@@ -1,10 +1,5 @@
-'use client'
-
-import { Input } from '@/components/ui/input'
-import { 
-  Send,
-  Paperclip
-} from 'lucide-react'
+import React from 'react'
+import { Send } from 'lucide-react'
 
 interface InputBarProps {
   value: string
@@ -13,86 +8,52 @@ interface InputBarProps {
   disabled?: boolean
   isDarkMode?: boolean
   placeholder?: string
-  onFileUpload?: (file: File) => void
 }
 
-export default function InputBar({ 
-  value, 
-  onChange, 
-  onSubmit, 
-  disabled = false, 
+export default function InputBar({
+  value,
+  onChange,
+  onSubmit,
+  disabled = false,
   isDarkMode = false,
-  placeholder = "Ask about your career...",
-  onFileUpload
+  placeholder = "Ask me anything..."
 }: InputBarProps) {
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (file && onFileUpload) {
-      // Check if it's a PDF file
-      if (file.type === 'application/pdf') {
-        onFileUpload(file)
-      } else {
-        alert('Please upload a PDF file only.')
-      }
-    }
-  }
 
   return (
-    <div className="w-full">
-      {/* Main Input Container */}
-      <div className={`relative w-full rounded-2xl border transition-all duration-200 focus-within:ring-2 focus-within:ring-opacity-50 ${
-        isDarkMode 
-          ? 'bg-slate-800/60 border-slate-600/50 focus-within:border-slate-500/70 focus-within:ring-slate-400/30' 
-          : 'bg-gray-50/90 border-gray-300/70 focus-within:border-gray-400/80 focus-within:ring-gray-500/30'
-      }`}>
+    <div className="relative w-full">
+      <div
+        className={`relative w-full rounded-xl backdrop-blur-md border transition-all duration-200 focus-within:ring-2 focus-within:ring-opacity-50 ${
+          isDarkMode
+            ? 'bg-slate-800/40 border-slate-600/40 focus-within:border-slate-500/60 focus-within:ring-slate-400/30'
+            : 'bg-white/80 border-gray-200/60 focus-within:border-gray-300/80 focus-within:ring-gray-400/30'
+        }`}
+      >
+        <input
+          type="text"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
+          disabled={disabled}
+          className={`w-full p-4 pr-20 bg-transparent rounded-xl focus:outline-none disabled:opacity-50 ${
+            isDarkMode 
+              ? 'text-slate-100 placeholder-slate-400' 
+              : 'text-gray-900 placeholder-gray-500'
+          }`}
+        />
         
-        {/* Main Input Field */}
-        <div className="flex items-center px-4 py-3 sm:px-6 sm:py-4">
-          {/* File Upload Button */}
-          {onFileUpload && (
-            <div className="relative mr-3">
-              <input
-                type="file"
-                accept=".pdf"
-                onChange={handleFileChange}
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                disabled={disabled}
-              />
-              <button
-                type="button"
-                disabled={disabled}
-                className={`p-2 rounded-lg transition-colors ${
-                  isDarkMode 
-                    ? 'text-slate-400 hover:text-slate-200 hover:bg-slate-700/50' 
-                    : 'text-gray-500 hover:text-gray-700 hover:bg-gray-200/50'
-                }`}
-              >
-                <Paperclip className="w-4 h-4 sm:w-5 sm:h-5" />
-              </button>
-            </div>
-          )}
-
-          {/* Text Input */}
-          <Input
-            value={value}
-            onChange={(e) => onChange(e.target.value)}
-            placeholder={placeholder}
-            disabled={disabled}
-            className={`flex-1 bg-transparent border-0 p-0 text-sm sm:text-base focus:outline-none focus:ring-0 text-black placeholder-gray-500`}
-          />
-
+        <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-2">
           {/* Send Button */}
-          <button
+          <button 
+            type="submit"
             onClick={onSubmit}
             disabled={!value.trim() || disabled}
-            className={`ml-3 p-2 sm:p-2.5 rounded-full transition-all duration-200 disabled:opacity-50 ${
+            className={`p-2 rounded-full transition-all duration-200 disabled:opacity-50 ${
               isDarkMode 
-                ? 'bg-slate-700/70 hover:bg-slate-600/90 text-slate-200 backdrop-blur-sm border border-slate-500/50' 
-                : 'bg-gray-200 hover:bg-gray-300 text-gray-700'
+                ? 'bg-slate-700/60 hover:bg-slate-600/80 text-slate-200 backdrop-blur-sm border border-slate-500/40' 
+                : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
             }`}
-            type="submit"
           >
-            <Send className="w-4 h-4 sm:w-5 sm:h-5" />
+            <Send className="w-4 h-4" />
           </button>
         </div>
       </div>

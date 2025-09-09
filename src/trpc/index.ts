@@ -128,10 +128,9 @@ export const appRouter = router({
 updateUser:publicProcedure.input(z.object({
   id:z.string(),
   email:z.string().email(),
-
 })).mutation(async ({ input }) => {
   const user = await prisma.user.update({where:{id:input.id},data:{email:input.email}})
-return user
+  return user
 }),
 
 // Chat procedures
@@ -232,7 +231,7 @@ sendMessage: publicProcedure
     });
 
     // Convert to ChatGPT format
-    const messages: ChatMessage[] = chatHistory.map(msg => ({
+    const messages: ChatMessage[] = chatHistory.map((msg: any) => ({
       role: msg.role as 'user' | 'assistant',
       content: msg.content,
     }));

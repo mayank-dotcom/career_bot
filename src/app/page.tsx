@@ -214,7 +214,7 @@ export default function Home() {
                 }}
               >
                 {chats && chats.length > 0 ? (
-                  chats.map((chat) => (
+                  chats.map((chat: any) => (
                     <div
                       key={chat.id}
                       onClick={() => handleChatSelect(chat.id)}

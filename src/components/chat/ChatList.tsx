@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { trpc } from '@/trpc/client'
@@ -11,13 +11,14 @@ import { ChatListSkeleton } from './ChatListSkeleton'
 interface Chat {
   id: string
   title: string
-  createdAt: Date
-  updatedAt: Date
+  createdAt: string
+  updatedAt: string
   messages: Array<{
     id: string
     content: string
     role: string
-    createdAt: Date
+    createdAt: string
+    status: string | null
   }>
 }
 
@@ -35,13 +36,15 @@ export default function ChatList({ userId, onChatSelect, selectedChatId, onUserN
     userId,
   }, {
     retry: false, // Don't retry on error
-    onError: (error) => {
-      if (error.message.includes('not found')) {
-        // User not found, trigger logout
-        onUserNotFound?.()
-      }
-    }
   })
+
+  // Handle error case
+  useEffect(() => {
+    if (chatsError && chatsError.message.includes('not found')) {
+      // User not found, trigger logout
+      onUserNotFound?.()
+    }
+  }, [chatsError, onUserNotFound])
 
   const createChatMutation = trpc.createChat.useMutation({
     onSuccess: (newChat) => {

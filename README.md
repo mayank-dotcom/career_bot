@@ -50,7 +50,6 @@ A modern, full-stack career counseling chatbot built with Next.js, tRPC, TanStac
 
 ### AI & External Services
 - **OpenAI GPT-3.5-turbo** - Advanced language model for career counseling
-- **PDF Processing** - Resume parsing and analysis capabilities
 
 ### Development Tools
 - **ESLint** - Code linting and quality assurance
@@ -158,7 +157,6 @@ frontend/
 ├── src/
 │   ├── app/                    # Next.js App Router
 │   │   ├── api/               # API routes
-│   │   │   ├── parse-pdf/     # PDF processing endpoint
 │   │   │   └── trpc/          # tRPC API handler
 │   │   ├── globals.css        # Global styles
 │   │   ├── layout.tsx         # Root layout
@@ -188,7 +186,6 @@ frontend/
 │   │   └── useMessageStatus.ts # Message status hook
 │   ├── lib/                   # Utility functions
 │   │   ├── chatgpt.ts         # OpenAI API integration
-│   │   ├── pdfParser.ts       # PDF processing
 │   │   ├── prisma.ts          # Database client
 │   │   └── utils.ts           # General utilities
 │   ├── trpc/                  # tRPC configuration

@@ -6,7 +6,6 @@ import ChatInterface from './ChatInterface'
 import InputBar from './InputBar'
 import { trpc } from '@/trpc/client'
 import toast from 'react-hot-toast'
-import { parsePDF } from '@/lib/pdfParser'
 
 interface ChatBotProps {
   userId: string
@@ -20,8 +19,6 @@ interface ChatBotProps {
 export default function ChatBot({ userId, onUserNotFound, selectedChatId, onChatCreated, initialMessage, isDarkMode }: ChatBotProps) {
   const [inputValue, setInputValue] = useState('')
   const [currentInitialMessage, setCurrentInitialMessage] = useState<string | undefined>(initialMessage)
-  const [isUploading, setIsUploading] = useState(false)
-  const [uploadedPdfData, setUploadedPdfData] = useState<string | null>(null)
 
   const createChatMutation = trpc.createChat.useMutation({
     onSuccess: (newChat) => {
@@ -56,42 +53,15 @@ export default function ChatBot({ userId, onUserNotFound, selectedChatId, onChat
     }
   }
 
-  const handleFileUpload = async (file: File) => {
-    setIsUploading(true)
-    try {
-      const parsedResume = await parsePDF(file)
-      
-      // Store the PDF data for use in chat
-      setUploadedPdfData(parsedResume.text)
-      
-      // If no chat is selected, create one with the PDF ready
-      if (!selectedChatId) {
-        setCurrentInitialMessage(`I've uploaded a PDF (${parsedResume.fileName}). Please help me with it.`)
-        createChatMutation.mutate({ 
-          userId, 
-          title: `PDF Chat - ${parsedResume.fileName}`
-        })
-      }
-      
-      toast.success(`PDF "${parsedResume.fileName}" uploaded successfully! Now type your message.`)
-    } catch (error) {
-      console.error('Error parsing PDF:', error)
-      toast.error('Failed to parse PDF. Please try again.')
-    } finally {
-      setIsUploading(false)
-    }
-  }
 
   return (
     <div className={`h-full transition-colors duration-300 ${isDarkMode ? 'bg-slate-900' : 'bg-white'}`}>
         {selectedChatId ? (
-          <ChatInterface 
-            chatId={selectedChatId} 
-            userId={userId} 
-            initialMessage={currentInitialMessage} 
+          <ChatInterface
+            chatId={selectedChatId}
+            userId={userId}
+            initialMessage={currentInitialMessage}
             isDarkMode={isDarkMode}
-            uploadedPdfData={uploadedPdfData}
-            onPdfDataUsed={() => setUploadedPdfData(null)}
           />
         ) : (
         <div className="h-full flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8">
@@ -167,10 +137,9 @@ export default function ChatBot({ userId, onUserNotFound, selectedChatId, onChat
                 value={inputValue}
                 onChange={setInputValue}
                 onSubmit={handleInputSubmit}
-                disabled={createChatMutation.isPending || isUploading}
+                disabled={createChatMutation.isPending}
                 isDarkMode={isDarkMode}
                 placeholder="Ask about your career..."
-                onFileUpload={handleFileUpload}
               />
             </form>
             </div>
