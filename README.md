@@ -73,7 +73,7 @@ cd career_bot/frontend
 
 ### 2. Install Dependencies
 ```bash
-npm install
+npm i --legacy-peer-deps
 ```
 
 ### 3. Environment Configuration
@@ -414,7 +414,7 @@ rm -rf .next
 
 # Reinstall dependencies
 rm -rf node_modules package-lock.json
-npm install
+npm i --legacy-peer-deps
 ```
 
 #### OpenAI API Issues
