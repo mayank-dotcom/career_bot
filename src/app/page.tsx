@@ -6,7 +6,6 @@ import { trpc } from '@/trpc/client'
 import { toast } from 'react-hot-toast'
 import ChatBot from '@/components/chat/ChatBot'
 import AuthForm from '@/components/auth/AuthForm'
-import { ThemeToggle } from '@/components/ui/theme-toggle'
 import { Bot, User, Plus, Menu, X, Moon, Sun } from 'lucide-react'
 
 // Type for the authenticated user

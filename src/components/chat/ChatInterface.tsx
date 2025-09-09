@@ -1,17 +1,12 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Card } from '@/components/ui/card'
 import { trpc } from '@/trpc/client'
 import { toast } from 'react-hot-toast'
-import { Send, Bot, User } from 'lucide-react'
-import { MessageStatus } from './MessageStatus'
 import { TypingIndicator } from './TypingIndicator'
 import { MessageBubble } from './MessageBubble'
 import InputBar from './InputBar'
-import { parsePDF, extractResumeSections } from '@/lib/pdfParser'
+import { parsePDF } from '@/lib/pdfParser'
 
 interface Message {
   id: string
@@ -48,31 +43,6 @@ export default function ChatInterface({ chatId, userId, initialMessage, isDarkMo
       setMessage('')
       setIsTyping(false)
       
-      // Continue status progression with the real message ID
-      const realMessageId = data.userMessage.id
-      
-      // Update status progression with real message ID
-      setTimeout(async () => {
-        try {
-          await updateMessageStatusMutation.mutateAsync({
-            messageId: realMessageId,
-            status: 'delivered'
-          })
-        } catch (error) {
-          console.error('Failed to update message status:', error)
-        }
-      }, 1000 + Math.random() * 500)
-      
-      setTimeout(async () => {
-        try {
-          await updateMessageStatusMutation.mutateAsync({
-            messageId: realMessageId,
-            status: 'read'
-          })
-        } catch (error) {
-          console.error('Failed to update message status:', error)
-        }
-      }, 2500 + Math.random() * 1000)
       
       // Clear pending message and refresh
       setPendingMessage(null)
@@ -86,7 +56,6 @@ export default function ChatInterface({ chatId, userId, initialMessage, isDarkMo
     },
   })
 
-  const updateMessageStatusMutation = trpc.updateMessageStatus.useMutation()
 
   const handleFileUpload = async (file: File) => {
     setIsUploading(true)
@@ -154,27 +123,10 @@ export default function ChatInterface({ chatId, userId, initialMessage, isDarkMo
     setMessage('')
     setIsTyping(true)
 
-    // WhatsApp-like status progression
-    const updateStatus = async (status: Message['status'], messageId?: string) => {
-      setPendingMessage(prev => prev ? { ...prev, status } : null)
-      
-      // Update in database if we have a real message ID
-      if (messageId) {
-        try {
-          await updateMessageStatusMutation.mutateAsync({
-            messageId: messageId,
-            status: status as 'sent' | 'delivered' | 'read' | 'error'
-          })
-        } catch (error) {
-          console.error('Failed to update message status:', error)
-        }
-      }
-    }
-
     // Simulate realistic timing - these will update the pending message
-    setTimeout(() => updateStatus('sent'), 300 + Math.random() * 200)
-    setTimeout(() => updateStatus('delivered'), 800 + Math.random() * 400)
-    setTimeout(() => updateStatus('read'), 2000 + Math.random() * 1000)
+    setTimeout(() => setPendingMessage(prev => prev ? { ...prev, status: 'sent' } : null), 300 + Math.random() * 200)
+    setTimeout(() => setPendingMessage(prev => prev ? { ...prev, status: 'delivered' } : null), 800 + Math.random() * 400)
+    setTimeout(() => setPendingMessage(prev => prev ? { ...prev, status: 'read' } : null), 2000 + Math.random() * 1000)
 
     try {
       // Include PDF content if available
@@ -194,7 +146,7 @@ export default function ChatInterface({ chatId, userId, initialMessage, isDarkMo
       })
     } catch (error) {
       console.error('Error sending message:', error)
-      updateStatus('error')
+      setPendingMessage(prev => prev ? { ...prev, status: 'error' } : null)
     }
   }
 

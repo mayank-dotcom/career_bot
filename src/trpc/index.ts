@@ -6,12 +6,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
 export const appRouter = router({
-    getUserName :publicProcedure.query(()=>{
-        return {username:"John Doe"}
-    }),
-    getUserAge :publicProcedure.query(()=>{
-        return {age:20}
-    }),
+   
     signup: publicProcedure
         .input(z.object({
             email: z.string().email(),
@@ -128,17 +123,7 @@ export const appRouter = router({
             }
         }),
 
-        createTodo:publicProcedure.input(z.object({
-          title:z.string(),
-          userId:z.string(),
-        })).mutation(async ({ input }) => {
-const todo = await prisma.todo.create({
-  data:{
-    userId: input.userId,
-    title: input.title,
-}})
-return todo
-        }),
+     
 
 updateUser:publicProcedure.input(z.object({
   id:z.string(),

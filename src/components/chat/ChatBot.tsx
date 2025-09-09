@@ -6,7 +6,7 @@ import ChatInterface from './ChatInterface'
 import InputBar from './InputBar'
 import { trpc } from '@/trpc/client'
 import toast from 'react-hot-toast'
-import { parsePDF, extractResumeSections } from '@/lib/pdfParser'
+import { parsePDF } from '@/lib/pdfParser'
 
 interface ChatBotProps {
   userId: string
